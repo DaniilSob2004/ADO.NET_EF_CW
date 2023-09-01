@@ -62,5 +62,27 @@
             <Label Grid.Row="6" Content="Two Departments:"/>
             <Label Grid.Column="1" Grid.Row="6" Content="0" x:Name="twoDepartCountLabel"/>
         </Grid>
+
+        <StackPanel Grid.Row="1">
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="btn1" Content="ФИО" Padding="5,2,5,2" Margin="5,2,5,2" Click="Btn1_Click"/>
+                <Button x:Name="btn2" Content="Dep" Padding="5,2,5,2" Margin="0,2,5,2" Click="Btn2_Click"/>
+                <Button x:Name="btn3" Content="Chf" Padding="5,2,5,2" Margin="0,2,5,2" Click="Btn3_Click"/>
+                <Button x:Name="btn4" Content="CrtDt" Padding="5,2,5,2" Margin="0,2,5,2" Click="Btn4_Click"/>
+                <Button x:Name="btn5" Content="Dep2" Padding="5,2,5,2" Margin="0,2,5,2" Click="Btn5_Click"/>
+            </StackPanel>
+            
+            <ScrollViewer Height="200">
+                <ListView ItemsSource="{Binding Pairs}">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Key" DisplayMemberBinding="{Binding Path=Key}" Width="150"/>
+                            <GridViewColumn Header="Value" DisplayMemberBinding="{Binding Path=Value}" Width="150"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </ScrollViewer>
+            
+        </StackPanel>
     </Grid>
 </Window>
