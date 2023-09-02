@@ -64,13 +64,21 @@
         </Grid>
 
         <StackPanel Grid.Row="1">
-            <StackPanel Orientation="Horizontal">
+            <WrapPanel Orientation="Horizontal">
                 <Button x:Name="btn1" Content="ФИО" Padding="5,2,5,2" Margin="5,2,5,2" Click="Btn1_Click"/>
                 <Button x:Name="btn2" Content="Dep" Padding="5,2,5,2" Margin="0,2,5,2" Click="Btn2_Click"/>
                 <Button x:Name="btn3" Content="Chf" Padding="5,2,5,2" Margin="0,2,5,2" Click="Btn3_Click"/>
                 <Button x:Name="btn4" Content="CrtDt" Padding="5,2,5,2" Margin="0,2,5,2" Click="Btn4_Click"/>
-                <Button x:Name="btn5" Content="Dep2" Padding="5,2,5,2" Margin="0,2,5,2" Click="Btn5_Click"/>
-            </StackPanel>
+                <Button x:Name="btn5" Content="Dep2" Padding="5,2,5,2" Margin="0,2,5,2" Click="Btn5_HW_Click"/>
+                <Button x:Name="btn6" Content="N-" Padding="5,2,5,2" Margin="0,2,5,2" Click="Btn6_Click"/>
+                <Button x:Name="btn7" Content="N+" Padding="5,2,5,2" Margin="0,2,5,2" Click="Btn7_Click"/>
+                <Button x:Name="btn8" Content="Group" Padding="5,2,5,2" Margin="0,2,5,2" Click="Btn8_Click"/>
+                <Button x:Name="btn9" Content="Group2" Padding="5,2,5,2" Margin="5,2,5,2" Click="Btn9_Click"/>
+                <Button x:Name="btn10" Content="OneSurname" Padding="5,2,5,2" Margin="0,2,5,2" Click="Btn10_Click"/>
+                <Button x:Name="btn11" Content="HW1" Padding="5,2,5,2" Margin="0,2,5,2" Click="Btn11_HW_Click"/>
+                <Button x:Name="btn12" Content="HW2" Padding="5,2,5,2" Margin="0,2,5,2" Click="Btn12_HW_Click"/>
+                <Button x:Name="btn13" Content="HW3" Padding="5,2,5,2" Margin="0,2,5,2" Click="Btn13_HW_Click"/>
+            </WrapPanel>
             
             <ScrollViewer Height="200">
                 <ListView ItemsSource="{Binding Pairs}">
