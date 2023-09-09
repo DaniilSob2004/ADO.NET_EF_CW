@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using second_.Data;
 
@@ -11,9 +12,11 @@ using second_.Data;
 namespace second_.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230905150153_NavMainDev")]
+    partial class NavMainDev
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -27,9 +30,6 @@ namespace second_.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeleteDt")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -70,7 +70,7 @@ namespace second_.Migrations
 
                     b.Property<string>("Login")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -94,44 +94,20 @@ namespace second_.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdChief");
-
                     b.HasIndex("IdMainDep");
-
-                    b.HasIndex("IdSecDep");
-
-                    b.HasIndex("Login")
-                        .IsUnique();
 
                     b.ToTable("Managers");
                 });
 
             modelBuilder.Entity("second_.Data.Entity.Manager", b =>
                 {
-                    b.HasOne("second_.Data.Entity.Manager", "Chief")
-                        .WithMany()
-                        .HasForeignKey("IdChief");
-
                     b.HasOne("second_.Data.Entity.Department", "MainDep")
-                        .WithMany("MainManagers")
+                        .WithMany()
                         .HasForeignKey("IdMainDep")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("second_.Data.Entity.Department", "SecDep")
-                        .WithMany()
-                        .HasForeignKey("IdSecDep");
-
-                    b.Navigation("Chief");
-
                     b.Navigation("MainDep");
-
-                    b.Navigation("SecDep");
-                });
-
-            modelBuilder.Entity("second_.Data.Entity.Department", b =>
-                {
-                    b.Navigation("MainManagers");
                 });
 #pragma warning restore 612, 618
         }

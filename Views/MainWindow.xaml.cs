@@ -1,26 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Microsoft.EntityFrameworkCore;
 using second_.Data;
 
-namespace second_
+namespace second_.Views
 {
     public partial class MainWindow : Window
     {
         private DataContext dataContext;
         public ObservableCollection<Pair> Pairs { get; set; }
+        public ObservableCollection<Data.Entity.Department> DepartmentsView { get; set; } = null!;
+        private ICollectionView departmentsListView = null!;
 
         public MainWindow()
         {
@@ -45,6 +42,16 @@ namespace second_
             itDepartCountLabel.Content = dataContext.Managers.Where(manager => manager.IdMainDep == itGuid || manager.IdSecDep == itGuid).Count().ToString();
 
             twoDepartCountLabel.Content = dataContext.Managers.Where(manager => manager.IdMainDep != null && manager.IdSecDep != null).Count().ToString();
+
+            // загружаем и соединяем dataContext.Departments с коллекцией ObservableCollection
+            dataContext.Departments.Load();  // загрузка данных из таблицы 'Departments' в память
+            DepartmentsView = dataContext.Departments.Local.ToObservableCollection();  // конвертирует коллекцию dataContext.Departments в ObservableCollection
+            departmentsListUI.ItemsSource = DepartmentsView;  // привязываем элемент интерфейса к ObservableCollection
+
+            // настраиваем объект коллекции ICollectionView, для лучшего обновления и фильтрации коллекции ObservableCollection
+            departmentsListView = CollectionViewSource.GetDefaultView(DepartmentsView);  // привязываем DepartmentsView к ICollectionView
+            departmentsListView.Filter = item => (item as Data.Entity.Department)?.DeleteDt == null;  // фильтр, выводим товары которые не удалены
+            //departmentsListView.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
         }
 
         private void UpdateCollection(IQueryable pairs)
@@ -159,15 +166,13 @@ namespace second_
         {
             // порядковий номер отдела - название отдела
             // Неправильное решение (получаем только одинаковые числа для каждой записи)
-            N = 1;
+            N = 1;  // генератор
             IQueryable query = dataContext.Departments
                 .OrderBy(d => d.Name)
                 .Select(  // ранее связывание
                     d => new Pair() { Key = N.ToString(), Value = d.Name }
-                );  // до N имеется одноразовое обращение при построении SQL запроса
-                    // не многоразовое обращение
-
-            // Pair в Select для того чтобы просто указать что хотим получить
+                );  // до N имеется одноразовое обращение при построении SQL запроса, но не многоразовое обращение
+            // Pair в Select для того чтобы просто указать что хотим получить на выходе
 
             UpdateCollection(query);
 
@@ -175,8 +180,8 @@ namespace second_
                 var query = ... задаёт правило, из чего будет построенный SQL
                 Какой SQL будет в результате?
                    SELECT 1, d.Name FROM Departments d ORDER BY d.Name
-                   при формировании запроса EF 'увидет', что к него входит переменная
-                   N, он её вычеслит и добавит в SQL - в запросе будет значение N (1)
+                   при формировании запроса EF 'увидет', что в него входит переменная N,
+                   он её вычеслит и добавит в SQL - в запросе будет значение N, т.е. один)
                 Итерация - по результатам запроса
                    1 - Бухгалтерия
                    1 - Отдел кадров
@@ -185,7 +190,7 @@ namespace second_
 
                 Это ранее связывание переменной, при подготовке запроса и перед выполнением запроса
                 Поэтому N - это 1 и остаётся.
-                N(1)  --> SQL --> рез-таты с (1), а не с N
+                N(1)  -->  SQL  -->  результаты с (1), а не с N
             */
         }
 
@@ -203,7 +208,6 @@ namespace second_
                         Value = d.Name       // повторяется и 'N' увеличивается
                     }
                 );
-
             UpdateCollection(query);
 
             /*  Как это работает? Отличия от Button6
@@ -217,7 +221,7 @@ namespace second_
                 обращением N увеличивается в геттере генератора N.
                 Это позднее связывание
 
-                (*)  -->  SQL  -->  рез-таты с N
+                (*)  -->  SQL  -->  результаты с N
              */
         }
 
@@ -250,6 +254,7 @@ namespace second_
                     m => m.IdChief,
                     (chief, m) => new Pair { Key = $"{chief.Surname} {chief.Name[0]}.{chief.Secname[0]}.", Value = m.Count().ToString() }
                 ).Where(pair => Convert.ToInt32(pair.Value) >= 2);
+
             UpdateCollection(query);
         }
 
@@ -263,7 +268,6 @@ namespace second_
                 // group.Key -> m => m.Surname
                 .Select(group => new Pair { Key = group.Key, Value = group.Count().ToString() })
                 .Where(p => p.Value != "1");
-                //.Select(p => new Pair { Key = N.ToString(), Value = p.Key });  // добавил для ДЗ
 
             UpdateCollection(query);
         }
@@ -308,6 +312,146 @@ namespace second_
                 .Take(3);
 
             UpdateCollection(query);
+        }
+
+        private void Btn14_Click(object sender, RoutedEventArgs e)
+        {
+            // работа с навигационными свойствами
+            // работник - название отдела
+            IQueryable query = dataContext.Managers
+                .Include(m => m.MainDep)  // вкл. навигационной зависимости
+                .Select(m => new Pair
+                {
+                    Key = m.Surname,
+                    Value = m.MainDep.Name  // навигационная зависимость
+                });
+
+            UpdateCollection(query);
+        }
+
+        private void Btn15_Click(object sender, RoutedEventArgs e)
+        {
+            // работа с навигационными свойствами
+            // работник - название отдела (secDep)
+            IQueryable query = dataContext.Managers
+                .Include(m => m.SecDep)
+                .Where(m => m.SecDep!.Name != null)
+                .Select(m => new Pair
+                {
+                    Key = m.Surname,
+                    Value = m.SecDep!.Name
+                });
+
+            UpdateCollection(query);
+        }
+
+        private void Btn16_Click(object sender, RoutedEventArgs e)
+        {
+            // работа с навигационными свойствами
+            // работник - шеф
+            IQueryable query = dataContext.Managers
+                .Include(m => m.Chief)
+                .Select(m => new Pair{
+                    Key = $"{m.Surname} {m.Name[0]}.{m.Secname[0]}.",
+                    Value = (m.Chief!.Surname == null) ? "--" : $"{m.Chief.Surname} {m.Chief.Name[0]}.{m.Chief.Secname[0]}."
+                });
+
+            UpdateCollection(query);
+        }
+
+        private void Btn17_Click(object sender, RoutedEventArgs e)
+        {
+            // обратные навигационные свойства
+            // отдел - кол-во работников
+            IQueryable query = dataContext.Departments
+                //.Include(d => d.MainManagers)  // необязательно
+                .Where(d => d.DeleteDt == null)
+                .Select(d => new Pair
+                {
+                    Key = d.Name,
+                    Value = d.MainManagers.Count().ToString()
+                })
+                .OrderByDescending(p => Convert.ToInt32(p.Value));
+
+            UpdateCollection(query);
+        }
+
+        private void Btn18_Click(object sender, RoutedEventArgs e)
+        {
+            // обратные навигационные свойства
+            // отдел(SecDep) - кол-во работников
+            IQueryable query = dataContext.Departments
+                .Include(d => d.SecManagers)  // необязательно
+                .Where(d => d.DeleteDt == null)
+                .Select(d => new Pair
+                {
+                    Key = d.Name,
+                    Value = d.SecManagers.Count().ToString()
+                })
+                .OrderByDescending(p => Convert.ToInt32(p.Value));
+
+            UpdateCollection(query);
+        }
+
+        private void Btn19_Click(object sender, RoutedEventArgs e)
+        {
+            IQueryable query = dataContext.Managers
+                .Include(m => m.SubManagers)  // необязательно
+                .Select(m => new Pair
+                {
+                    Key = m.Surname,
+                    Value = m.SubManagers.Count().ToString()
+                });
+
+            UpdateCollection(query);
+        }
+
+
+        private void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is ListViewItem item)
+            {
+                if (item.Content is Data.Entity.Department department)  // department - это отдел, по которому кликнули
+                {
+                    CrudDepartmentWindow dialog = new() { Department = department };
+                    if (dialog.ShowDialog() ?? false)
+                    {
+                        if (dialog.Department is not null)  // not null - это значит dep изменили 
+                        {
+                            var dep = dataContext.Departments.Find(department.Id);  // находим в БД dep по указанному Id
+                            if (dep is not null)  // если найдено
+                            {
+                                if (dialog.IsDeleted)  // лёгкое удаление
+                                {
+                                    dep.DeleteDt = DateTime.Now;
+                                }
+                                else
+                                {
+                                    dep.Name = department.Name;
+                                }
+                            }
+                        }
+                        else  // null, значит dep удалено
+                        {
+                            dataContext.Departments.Remove(department!);
+                        }
+                        dataContext.SaveChanges();
+                        departmentsListView.Refresh();
+                    }
+                }
+            }
+        }
+
+        private void AddDepartmentBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Data.Entity.Department newDep = new() { Id = Guid.NewGuid(), Name = "" };
+            CrudDepartmentWindow dialog = new() { Department = newDep };
+            if (dialog.ShowDialog() ?? false)  // save btn
+            {
+                dataContext.Departments.Add(newDep);  // добавляем отдел в БД
+                dataContext.SaveChanges();  // сохраняем изменения в БД
+                departmentsListView.Refresh();
+            }
         }
     }
 

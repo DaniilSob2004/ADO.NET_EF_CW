@@ -1,0 +1,41 @@
+﻿<Window x:Class="second_.Views.CrudDepartmentWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:second_.Views"
+        mc:Ignorable="d"
+        Loaded="Window_Loaded"
+        Title="CrudDepartmentWindow" Height="250" Width="400" WindowStartupLocation="CenterScreen">
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2.5*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Label Grid.ColumnSpan="2" Content="Edit Department" FontSize="18" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+
+        <Label Content="Id: " Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+        <TextBox x:Name="idTextBox" Grid.Row="1" Grid.Column="1" IsEnabled="False"/>
+
+        <Label Content="Name: " Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+        <TextBox x:Name="nameTextBox" Grid.Row="2" Grid.Column="1" IsEnabled="True"/>
+
+        <UniformGrid Grid.Row="3" Grid.ColumnSpan="3">
+            <Button x:Name="saveBtn" Content="Save" Padding="15,3,15,3"
+                Click="SaveBtn_Click"/>
+            <Button x:Name="softDelBtn" Content="Soft delete" Padding="15,3,15,3"
+                Click="SoftDelBtn_Click"/>
+            <Button x:Name="hardDelBtn" Content="Hard delete" Padding="15,3,15,3"
+                Click="HardDelBtn_Click"/>
+        </UniformGrid>
+
+    </Grid>
+</Window>

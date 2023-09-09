@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using second_.Data;
 
@@ -11,9 +12,11 @@ using second_.Data;
 namespace second_.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230908095319_DeleteDtDepartment")]
+    partial class DeleteDtDepartment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,7 +73,7 @@ namespace second_.Migrations
 
                     b.Property<string>("Login")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -100,9 +103,6 @@ namespace second_.Migrations
 
                     b.HasIndex("IdSecDep");
 
-                    b.HasIndex("Login")
-                        .IsUnique();
-
                     b.ToTable("Managers");
                 });
 
@@ -113,7 +113,7 @@ namespace second_.Migrations
                         .HasForeignKey("IdChief");
 
                     b.HasOne("second_.Data.Entity.Department", "MainDep")
-                        .WithMany("MainManagers")
+                        .WithMany()
                         .HasForeignKey("IdMainDep")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -127,11 +127,6 @@ namespace second_.Migrations
                     b.Navigation("MainDep");
 
                     b.Navigation("SecDep");
-                });
-
-            modelBuilder.Entity("second_.Data.Entity.Department", b =>
-                {
-                    b.Navigation("MainManagers");
                 });
 #pragma warning restore 612, 618
         }

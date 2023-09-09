@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace second_.Data.Entity
 {
@@ -18,5 +19,14 @@ namespace second_.Data.Entity
         public DateTime? DeleteDt { get; set; }
         public String Email { get; set; } = null!;
         public String? Avatar { get; set; }
+
+
+        //////////////////// Navigation props ////////////////////
+        public Department MainDep { get; set; } = null!;  // навигационное свойство
+        public Department? SecDep { get; set; }  // опционально навигационное свойство (?)
+        public Manager? Chief { get; set; }  // опционально навигационное свойство (?)
+
+        //////////////////// Inverse Navigation props ////////////////////
+        public List<Manager> SubManagers { get; set; } = null!;
     }
 }
