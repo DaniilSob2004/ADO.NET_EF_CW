@@ -314,6 +314,7 @@ namespace second_.Views
             UpdateCollection(query);
         }
 
+
         private void Btn14_Click(object sender, RoutedEventArgs e)
         {
             // работа с навигационными свойствами
@@ -366,12 +367,12 @@ namespace second_.Views
             IQueryable query = dataContext.Departments
                 //.Include(d => d.MainManagers)  // необязательно
                 .Where(d => d.DeleteDt == null)
+                .OrderByDescending(d => Convert.ToInt32(d.MainManagers.Count()))
                 .Select(d => new Pair
                 {
                     Key = d.Name,
-                    Value = d.MainManagers.Count().ToString()
-                })
-                .OrderByDescending(p => Convert.ToInt32(p.Value));
+                    Value = (d.MainManagers.Count() != 0) ? d.MainManagers.Count().ToString() : "закрытый"
+                });
 
             UpdateCollection(query);
         }
@@ -383,12 +384,12 @@ namespace second_.Views
             IQueryable query = dataContext.Departments
                 .Include(d => d.SecManagers)  // необязательно
                 .Where(d => d.DeleteDt == null)
+                .OrderByDescending(d => Convert.ToInt32(d.SecManagers.Count()))
                 .Select(d => new Pair
                 {
                     Key = d.Name,
-                    Value = d.SecManagers.Count().ToString()
-                })
-                .OrderByDescending(p => Convert.ToInt32(p.Value));
+                    Value = (d.SecManagers.Count() != 0) ? d.SecManagers.Count().ToString() : "закрытый"
+                });
 
             UpdateCollection(query);
         }
@@ -397,6 +398,7 @@ namespace second_.Views
         {
             IQueryable query = dataContext.Managers
                 .Include(m => m.SubManagers)  // необязательно
+                .Where(m => m.SubManagers.Count() > 0)
                 .Select(m => new Pair
                 {
                     Key = m.Surname,
