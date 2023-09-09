@@ -1,3 +1,7 @@
+ - Fifth HW:
+
+![HW10](https://github.com/DaniilSob2004/ADO.NET_EF_CW/assets/106149184/d86be9fc-0ef7-4ef5-a8a3-554da577b5f3)
+
  - Fourth HW:
 
 ![HW9](https://github.com/DaniilSob2004/ADO.NET_EF_CW/assets/106149184/e916b565-2314-4e99-be8f-ff90f6336c1c)
